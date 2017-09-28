@@ -1,0 +1,11 @@
+The small project that we would like you to work on, is to replicate the Bitfinex order books and trade history widget
+UI on react/redux using https://docs.bitfinex.com/v2/docs websockets stream. Also it would be nice if you can show the
+ticker as well.
+
+There should also be a button that, once clicked, force closes the websocket connection, so you have to develop a proper
+retry/reconnect/resubscribe logic.
+
+If you have time also please create a basic chart, and it would be nice to see how you would make a minified version of
+the project assets using webpack.
+
+The documentation for the websockets are hopefully quite clear, but let us know if you have any questions!
