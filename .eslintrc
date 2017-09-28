@@ -1,0 +1,40 @@
+{
+
+  "extends": [
+    "airbnb",
+    "plugin:import/errors"
+  ],
+  "rules": {
+    "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
+    "no-unused-vars": ["error", { "vars": "all", "args": "all", "argsIgnorePattern": "ignored" }],
+    "react/sort-comp": [2, {
+      "order": [
+        "static-methods",
+        "lifecycle",
+        "everything-else",
+        "rendering"
+      ],
+      "groups": {
+        "rendering": [
+          "/^render.+$/",
+          "render"
+        ]
+      }
+    }],
+    "max-len": ["error", {
+      "code": 120
+    }],
+    "react/prefer-stateless-function": 0,
+    "jsx-a11y/href-no-hash": 0
+  },
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "webpack.config.js"
+      }
+    }
+  },
+  "env": {
+    "browser": true
+  }
+}
