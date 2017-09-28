@@ -55,7 +55,8 @@ const configuration = {
           loader: 'babel-loader',
           options: {
             presets: ['env', 'react'],
-            plugins: ['transform-runtime'],
+            plugins: ['transform-runtime', 'transform-class-properties', 'transform-es2015-spread',
+              'transform-object-rest-spread'],
           },
         },
       },

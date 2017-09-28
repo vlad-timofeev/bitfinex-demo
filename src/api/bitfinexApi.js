@@ -1,4 +1,4 @@
-export default function connect() {
+export default function connectWs() {
   const ws = new WebSocket('wss://api.bitfinex.com/ws/2');
   ws.onopen = (() => {
     console.log('Connected');
@@ -7,11 +7,7 @@ export default function connect() {
       channel: 'trades',
       symbol: 'tBTCUSD',
     };
-    ws.send(message);
     ws.send(JSON.stringify(message));
-  });
-  ws.onmessage = ((message) => {
-    console.log(message);
   });
   ws.onerror = ((error) => {
     console.error(error);
@@ -20,4 +16,5 @@ export default function connect() {
     console.log('Closed');
     console.log(obj);
   });
+  return ws;
 }
