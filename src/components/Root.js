@@ -21,6 +21,13 @@ const ORDERS_UPDATE_FREQUENCY = {
   THROTTLED: 'F1',
 };
 
+const ORDERS_UPDATE_PRECISION = {
+  P0: 'P0',
+  P1: 'P1',
+  P2: 'P2',
+  P3: 'P3',
+};
+
 function getSubscribeMessage(channel, fields) {
   return ({
     ...fields,
@@ -56,6 +63,7 @@ export default connect()(class extends React.PureComponent {
       bookChannelId: 0,
       tickerChannelId: 0,
       ordersUpdateFrequency: ORDERS_UPDATE_FREQUENCY.REAL_TIME,
+      ordersUpdatePrecision: ORDERS_UPDATE_PRECISION.P0,
     });
   }
 
@@ -73,11 +81,8 @@ export default connect()(class extends React.PureComponent {
     }
   }
 
-  toggleOrdersFrequency() {
-    const { ordersUpdateFrequency, bookChannelId } = this.state;
-    const nextFrequency = (ordersUpdateFrequency === ORDERS_UPDATE_FREQUENCY.REAL_TIME)
-      ? ORDERS_UPDATE_FREQUENCY.THROTTLED : ORDERS_UPDATE_FREQUENCY.REAL_TIME;
-    this.setState({ ordersUpdateFrequency: nextFrequency });
+  resubscribeToOrders() {
+    const { bookChannelId } = this.state;
     if (bookChannelId) {
       this.state.ws.send(JSON.stringify({
         event: 'unsubscribe',
@@ -86,10 +91,21 @@ export default connect()(class extends React.PureComponent {
     }
   }
 
+  toggleOrdersFrequency() {
+    const { ordersUpdateFrequency } = this.state;
+    const nextFrequency = (ordersUpdateFrequency === ORDERS_UPDATE_FREQUENCY.REAL_TIME)
+      ? ORDERS_UPDATE_FREQUENCY.THROTTLED : ORDERS_UPDATE_FREQUENCY.REAL_TIME;
+    this.setState({ ordersUpdateFrequency: nextFrequency });
+    this.resubscribeToOrders();
+  }
+
   onWsOpen() {
     this.setState({ wsState: WS_STATE.CONNECTED });
     this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
-    this.state.ws.send(JSON.stringify(getSubscribeMessage('book', { freq: this.state.ordersUpdateFrequency })));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('book', {
+      freq: this.state.ordersUpdateFrequency,
+      prec: this.state.ordersUpdatePrecision,
+    })));
     this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
   }
 
@@ -99,7 +115,10 @@ export default connect()(class extends React.PureComponent {
     if (event === 'subscribed') {
       this.handleSubscribedEvent(data);
     } else if (event === 'unsubscribed') {
-      this.state.ws.send(JSON.stringify(getSubscribeMessage('book', { freq: this.state.ordersUpdateFrequency })));
+      this.state.ws.send(JSON.stringify(getSubscribeMessage('book', {
+        freq: this.state.ordersUpdateFrequency,
+        prec: this.state.ordersUpdatePrecision,
+      })));
     } else if (Array.isArray(data)) {
       const channelId = data[0];
       const { tradesChannelId, bookChannelId, tickerChannelId } = this.state;
@@ -192,6 +211,18 @@ export default connect()(class extends React.PureComponent {
     }
     const throttleButtonLabel = (this.state.ordersUpdateFrequency === ORDERS_UPDATE_FREQUENCY.REAL_TIME)
       ? 'Throttle' : 'Real-time';
+
+    const increasePrecLabel = 'Increase Precision';
+    const decreasePrecLabel = 'Decrease Precision';
+    const { ordersUpdatePrecision } = this.state;
+    const changePrecision = (adjustment) => {
+      const precisionKeys = Object.keys(ORDERS_UPDATE_PRECISION);
+      const currentIndex = precisionKeys.findIndex(index => ORDERS_UPDATE_PRECISION[index] === ordersUpdatePrecision);
+      const nextPrecision = precisionKeys[currentIndex + adjustment];
+      this.setState({ ordersUpdatePrecision: nextPrecision }, this.resubscribeToOrders);
+    };
+    const increasePrecision = changePrecision.bind(this, -1);
+    const decreasePrecision = changePrecision.bind(this, 1);
     return (
       <div>
         <button onClick={this.toggleConnectionButton} disabled={buttonDisabled}>
@@ -199,6 +230,12 @@ export default connect()(class extends React.PureComponent {
         </button>
         <button onClick={this.toggleOrdersFrequency}>
           {throttleButtonLabel}
+        </button>
+        <button onClick={increasePrecision} disabled={ordersUpdatePrecision === ORDERS_UPDATE_PRECISION.P0}>
+          {increasePrecLabel}
+        </button>
+        <button onClick={decreasePrecision} disabled={ordersUpdatePrecision === ORDERS_UPDATE_PRECISION.P3}>
+          {decreasePrecLabel}
         </button>
         <Ticker />
         <Orders />

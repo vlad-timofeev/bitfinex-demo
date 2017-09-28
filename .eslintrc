@@ -28,7 +28,8 @@
     "jsx-a11y/href-no-hash": 0,
     "no-console": 0,
     "import/prefer-default-export": 0,
-    "react/require-default-props": 0
+    "react/require-default-props": 0,
+    "react/jsx-no-bind": 0
   },
   "settings": {
     "import/resolver": "webpack"
