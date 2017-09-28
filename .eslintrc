@@ -27,7 +27,8 @@
     "react/prefer-stateless-function": 0,
     "jsx-a11y/href-no-hash": 0,
     "no-console": 0,
-    "import/prefer-default-export": 0
+    "import/prefer-default-export": 0,
+    "react/require-default-props": 0
   },
   "settings": {
     "import/resolver": "webpack"

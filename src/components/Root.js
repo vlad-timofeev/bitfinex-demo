@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import connectWs from 'src/api/bitfinexApi';
+import Ticker from 'src/components/Ticker';
 import Trades from 'src/components/Trades';
-import { addTrade, setTrades } from 'src/redux/actions';
-import { TRADE } from 'src/redux/model';
+import { addTrade, setTrades, updateTicker } from 'src/redux/actions';
+import { TRADE, TICKER } from 'src/redux/model';
 
 const WS_STATE = {
   NOT_CONNECTED: 'NOT_CONNECTED',
@@ -27,6 +28,7 @@ export default connect()(class extends React.PureComponent {
     this.onWsMessage = this.onWsMessage.bind(this);
     this.onWsClosed = this.onWsClosed.bind(this);
     this.handleTradeEvent = this.handleTradeEvent.bind(this);
+    this.handleTickerEvent = this.handleTickerEvent.bind(this);
   }
 
   componentWillMount() {
@@ -60,7 +62,7 @@ export default connect()(class extends React.PureComponent {
     }));
     this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
     // ws.send(JSON.stringify(getSubscribeMessage('book')));
-    // this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
   }
 
   onWsMessage(message) {
@@ -83,6 +85,8 @@ export default connect()(class extends React.PureComponent {
     let handler;
     if (channel === 'trades') {
       handler = this.handleTradeEvent;
+    } else if (channel === 'ticker') {
+      handler = this.handleTickerEvent;
     }
     this.setState({
       channelIdHandlerMap: {
@@ -111,6 +115,19 @@ export default connect()(class extends React.PureComponent {
     }
   }
 
+  handleTickerEvent(data) {
+    const deserializeTicker = (tickerArray => ({
+      [TICKER.LAST_PRICE]: tickerArray[6],
+      [TICKER.VOLUME]: tickerArray[7],
+      [TICKER.HIGH]: tickerArray[8],
+      [TICKER.LOW]: tickerArray[9],
+    }));
+    if (data.length === 2 && Array.isArray(data[1])) {
+      const ticker = deserializeTicker(data[1]);
+      this.props.dispatch(updateTicker(ticker));
+    }
+  }
+
   render() {
     let buttonDisabled = true;
     let buttonLabel = 'Wait...';
@@ -126,6 +143,7 @@ export default connect()(class extends React.PureComponent {
         <button onClick={this.toggleConnectionButton} disabled={buttonDisabled}>
           {buttonLabel}
         </button>
+        <Ticker />
         <Trades />
       </div>
     );
