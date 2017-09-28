@@ -6,8 +6,8 @@ import connectWs from 'src/api/bitfinexApi';
 import Ticker from 'src/components/Ticker';
 import Trades from 'src/components/Trades';
 import Orders from 'src/components/Orders';
-import { addTrade, setTrades, updateTicker, setOrders, updateOrder } from 'src/redux/actions';
-import { TRADE, TICKER, ORDER } from 'src/redux/model';
+import { addTrade, setOrders, setTrades, updateOrder, updateTicker } from 'src/redux/actions';
+import { ORDER, TICKER, TRADE } from 'src/redux/model';
 
 const WS_STATE = {
   NOT_CONNECTED: 'NOT_CONNECTED',
@@ -15,6 +15,20 @@ const WS_STATE = {
   CONNECTED: 'CONNECTED',
   CLOSING: 'CLOSING',
 };
+
+const ORDERS_UPDATE_FREQUENCY = {
+  REAL_TIME: 'F0',
+  THROTTLED: 'F1',
+};
+
+function getSubscribeMessage(channel, fields) {
+  return ({
+    ...fields,
+    event: 'subscribe',
+    symbol: 'tBTCUSD',
+    channel,
+  });
+}
 
 export default connect()(class extends React.PureComponent {
   static propTypes = {
@@ -25,6 +39,7 @@ export default connect()(class extends React.PureComponent {
     super(props);
 
     this.toggleConnectionButton = this.toggleConnectionButton.bind(this);
+    this.toggleOrdersFrequency = this.toggleOrdersFrequency.bind(this);
     this.onWsOpen = this.onWsOpen.bind(this);
     this.onWsMessage = this.onWsMessage.bind(this);
     this.onWsClosed = this.onWsClosed.bind(this);
@@ -37,7 +52,10 @@ export default connect()(class extends React.PureComponent {
     this.setState({
       ws: null,
       wsState: WS_STATE.NOT_CONNECTED,
-      channelIdHandlerMap: {},
+      tradesChannelId: 0,
+      bookChannelId: 0,
+      tickerChannelId: 0,
+      ordersUpdateFrequency: ORDERS_UPDATE_FREQUENCY.REAL_TIME,
     });
   }
 
@@ -55,49 +73,64 @@ export default connect()(class extends React.PureComponent {
     }
   }
 
+  toggleOrdersFrequency() {
+    const { ordersUpdateFrequency, bookChannelId } = this.state;
+    const nextFrequency = (ordersUpdateFrequency === ORDERS_UPDATE_FREQUENCY.REAL_TIME)
+      ? ORDERS_UPDATE_FREQUENCY.THROTTLED : ORDERS_UPDATE_FREQUENCY.REAL_TIME;
+    this.setState({ ordersUpdateFrequency: nextFrequency });
+    if (bookChannelId) {
+      this.state.ws.send(JSON.stringify({
+        event: 'unsubscribe',
+        chanId: bookChannelId,
+      }));
+    }
+  }
+
   onWsOpen() {
     this.setState({ wsState: WS_STATE.CONNECTED });
-    const getSubscribeMessage = (channel => ({
-      event: 'subscribe',
-      symbol: 'tBTCUSD',
-      channel,
-    }));
-    // this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
-    this.state.ws.send(JSON.stringify(getSubscribeMessage('book')));
-    // this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('book', { freq: this.state.ordersUpdateFrequency })));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
   }
 
   onWsMessage(message) {
-    console.log(message);
     const data = JSON.parse(message.data);
     const { event } = data;
     if (event === 'subscribed') {
       this.handleSubscribedEvent(data);
-    } else if (Array.isArray(data) && this.state.channelIdHandlerMap[data[0]]) {
-      this.state.channelIdHandlerMap[data[0]](data);
+    } else if (event === 'unsubscribed') {
+      this.state.ws.send(JSON.stringify(getSubscribeMessage('book', { freq: this.state.ordersUpdateFrequency })));
+    } else if (Array.isArray(data)) {
+      const channelId = data[0];
+      const { tradesChannelId, bookChannelId, tickerChannelId } = this.state;
+      if (channelId === bookChannelId) {
+        this.handleOrderEvent(data);
+      } else if (channelId === tickerChannelId) {
+        this.handleTickerEvent(data);
+      } else if (channelId === tradesChannelId) {
+        this.handleTradeEvent(data);
+      }
     }
   }
 
   onWsClosed() {
-    this.setState({ wsState: WS_STATE.NOT_CONNECTED });
+    this.setState({
+      wsState: WS_STATE.NOT_CONNECTED,
+      tradesChannelId: 0,
+      bookChannelId: 0,
+      tickerChannelId: 0,
+    });
   }
 
   handleSubscribedEvent(data) {
     const { channel, chanId } = data;
-    let handler;
     if (channel === 'trades') {
-      handler = this.handleTradeEvent;
+      this.setState({ tradesChannelId: chanId });
     } else if (channel === 'ticker') {
-      handler = this.handleTickerEvent;
+      this.setState({ tickerChannelId: chanId });
     } else if (channel === 'book') {
-      handler = this.handleOrderEvent;
+      this.setState({ bookChannelId: chanId });
     }
-    this.setState({
-      channelIdHandlerMap: {
-        ...this.state.channelIdHandlerMap,
-        [chanId]: handler,
-      },
-    });
   }
 
   handleTradeEvent(data) {
@@ -157,14 +190,19 @@ export default connect()(class extends React.PureComponent {
       buttonDisabled = false;
       buttonLabel = 'Disconnect';
     }
+    const throttleButtonLabel = (this.state.ordersUpdateFrequency === ORDERS_UPDATE_FREQUENCY.REAL_TIME)
+      ? 'Throttle' : 'Real-time';
     return (
       <div>
         <button onClick={this.toggleConnectionButton} disabled={buttonDisabled}>
           {buttonLabel}
         </button>
+        <button onClick={this.toggleOrdersFrequency}>
+          {throttleButtonLabel}
+        </button>
         <Ticker />
-        <Trades />
         <Orders />
+        <Trades />
       </div>
     );
   }
