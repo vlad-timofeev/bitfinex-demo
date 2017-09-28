@@ -21,3 +21,16 @@ export function updateTicker(ticker) {
   };
 }
 
+export function setOrders(orders) {
+  return {
+    type: types.SET_ORDERS,
+    orders,
+  };
+}
+
+export function updateOrder(order) {
+  return {
+    type: types.UPDATE_ORDER,
+    order,
+  };
+}

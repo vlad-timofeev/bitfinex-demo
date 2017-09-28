@@ -5,8 +5,9 @@ import { connect } from 'react-redux';
 import connectWs from 'src/api/bitfinexApi';
 import Ticker from 'src/components/Ticker';
 import Trades from 'src/components/Trades';
-import { addTrade, setTrades, updateTicker } from 'src/redux/actions';
-import { TRADE, TICKER } from 'src/redux/model';
+import Orders from 'src/components/Orders';
+import { addTrade, setTrades, updateTicker, setOrders, updateOrder } from 'src/redux/actions';
+import { TRADE, TICKER, ORDER } from 'src/redux/model';
 
 const WS_STATE = {
   NOT_CONNECTED: 'NOT_CONNECTED',
@@ -29,6 +30,7 @@ export default connect()(class extends React.PureComponent {
     this.onWsClosed = this.onWsClosed.bind(this);
     this.handleTradeEvent = this.handleTradeEvent.bind(this);
     this.handleTickerEvent = this.handleTickerEvent.bind(this);
+    this.handleOrderEvent = this.handleOrderEvent.bind(this);
   }
 
   componentWillMount() {
@@ -60,9 +62,9 @@ export default connect()(class extends React.PureComponent {
       symbol: 'tBTCUSD',
       channel,
     }));
-    this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
-    // ws.send(JSON.stringify(getSubscribeMessage('book')));
-    this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
+    // this.state.ws.send(JSON.stringify(getSubscribeMessage('trades')));
+    this.state.ws.send(JSON.stringify(getSubscribeMessage('book')));
+    // this.state.ws.send(JSON.stringify(getSubscribeMessage('ticker')));
   }
 
   onWsMessage(message) {
@@ -87,6 +89,8 @@ export default connect()(class extends React.PureComponent {
       handler = this.handleTradeEvent;
     } else if (channel === 'ticker') {
       handler = this.handleTickerEvent;
+    } else if (channel === 'book') {
+      handler = this.handleOrderEvent;
     }
     this.setState({
       channelIdHandlerMap: {
@@ -128,6 +132,21 @@ export default connect()(class extends React.PureComponent {
     }
   }
 
+  handleOrderEvent(data) {
+    const deserializeOrder = (orderArray => ({
+      [ORDER.PRICE]: orderArray[0],
+      [ORDER.COUNT]: orderArray[1],
+      [ORDER.AMOUNT]: orderArray[2],
+    }));
+    const nestedData = data[1];
+    if (Array.isArray(nestedData) && Array.isArray(nestedData[0])) {
+      const orders = nestedData.map(order => deserializeOrder(order));
+      this.props.dispatch(setOrders(orders));
+    } else if (Array.isArray(nestedData)) {
+      this.props.dispatch(updateOrder(deserializeOrder(nestedData)));
+    }
+  }
+
   render() {
     let buttonDisabled = true;
     let buttonLabel = 'Wait...';
@@ -145,6 +164,7 @@ export default connect()(class extends React.PureComponent {
         </button>
         <Ticker />
         <Trades />
+        <Orders />
       </div>
     );
   }

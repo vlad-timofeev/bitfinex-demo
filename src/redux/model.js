@@ -27,3 +27,15 @@ export const TICKER_PROPS = {
   [TICKER.HIGH]: PropTypes.number,
   [TICKER.LOW]: PropTypes.number,
 };
+
+export const ORDER = {
+  PRICE: 'price',
+  COUNT: 'count',
+  AMOUNT: 'amount',
+};
+
+export const ORDER_PROPS = {
+  [ORDER.PRICE]: PropTypes.number,
+  [ORDER.COUNT]: PropTypes.number,
+  [ORDER.AMOUNT]: PropTypes.number,
+};
