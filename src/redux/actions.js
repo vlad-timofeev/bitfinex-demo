@@ -13,3 +13,11 @@ export function addTrade(trade) {
     trade,
   };
 }
+
+export function updateTicker(ticker) {
+  return {
+    type: types.UPDATE_TICKER,
+    ticker,
+  };
+}
+

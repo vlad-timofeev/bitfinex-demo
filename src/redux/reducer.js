@@ -1,8 +1,9 @@
-import { TRADES } from './constants';
+import { TRADES, TICKER } from './constants';
 import * as types from './actionTypes';
 
 const initialState = {
   [TRADES]: [],
+  [TICKER]: null,
 };
 
 export default function reducer(state = initialState, action) {
@@ -16,6 +17,11 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         [TRADES]: [...state[TRADES], action.trade],
+      };
+    case types.UPDATE_TICKER:
+      return {
+        ...state,
+        [TICKER]: action.ticker,
       };
     default:
       return state;

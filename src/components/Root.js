@@ -8,7 +8,7 @@ import { addTrade } from 'src/redux/actions';
 import { TRADE } from 'src/redux/model';
 
 export default connect()(class extends React.PureComponent {
-  propTypes = {
+  static propTypes = {
     dispatch: PropTypes.func.isRequired,
   };
 
