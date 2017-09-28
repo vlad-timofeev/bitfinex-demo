@@ -1,0 +1,11 @@
+# Intellij IDEA
+.idea/*
+
+# Dependency directory
+node_modules
+
+# Build directory
+build
+
+# Debug files
+npm-debug.log
