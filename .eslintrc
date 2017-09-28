@@ -25,14 +25,11 @@
       "code": 120
     }],
     "react/prefer-stateless-function": 0,
-    "jsx-a11y/href-no-hash": 0
+    "jsx-a11y/href-no-hash": 0,
+    "no-console": 0
   },
   "settings": {
-    "import/resolver": {
-      "webpack": {
-        "config": "webpack.config.js"
-      }
-    }
+    "import/resolver": "webpack"
   },
   "env": {
     "browser": true

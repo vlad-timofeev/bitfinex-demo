@@ -22,6 +22,7 @@ const configuration = {
 
   resolve: {
     extensions: ['.js', '.css'],
+    modules: [path.resolve(__dirname), 'node_modules'],
   },
 
   plugins: [
