@@ -40,7 +40,8 @@ const configuration = {
   devServer: {
     contentBase: './build',
     noInfo: true,
-    inline: true,
+    hot: false,
+    inline: false,
     historyApiFallback: true,
     port: PORT,
     host: HOST,
