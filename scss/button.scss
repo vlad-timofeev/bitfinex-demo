@@ -1,0 +1,19 @@
+button {
+  margin: 5px;
+  background-color: #4CAF50;
+  cursor: pointer;
+  min-width: 100px;
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #7CAFA0;
+}
+
+button:disabled,
+button[disabled]{
+  background-color: #cccccc;
+  cursor: default;
+}
