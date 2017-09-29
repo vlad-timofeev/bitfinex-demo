@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import Container from 'src/components/Container';
 import Store from 'src/redux/Store';
 
+import 'scss/main.scss';
 // ID of the DOM element to mount app on
 const ROOT_ELEMENT_ID = 'root-container';
 

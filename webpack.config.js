@@ -63,8 +63,8 @@ const configuration = {
       },
       {
         test: /\.scss$/,
-        exclude: /(node_modules)/,
-        loaders: ['style-loader', 'css-loader', 'sass-loader'],
+        exclude: ['node_modules'],
+        loaders: ['style-loader', 'css-loader?importLoaders=1', 'sass-loader'],
       },
     ],
   },
