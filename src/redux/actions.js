@@ -55,3 +55,10 @@ export function setUpdatePrecision(precision) {
     precision,
   };
 }
+
+export function setResubscribingToOrders(resubscribingToOrders) {
+  return {
+    type: types.SET_RESUBSCRIBING_TO_ORDERS,
+    resubscribingToOrders,
+  };
+}

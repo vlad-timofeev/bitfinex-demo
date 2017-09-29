@@ -8,7 +8,7 @@ import Trades from 'src/components/Trades';
 import Orders from 'src/components/Orders';
 
 import { setUpdateFrequency, setUpdatePrecision, setWsState } from 'src/redux/actions';
-import { getUpdateFrequency, getUpdatePrecision, getWsState } from 'src/redux/selectors';
+import { getUpdateFrequency, getUpdatePrecision, getWsState, isResubscribingToOrders } from 'src/redux/selectors';
 import {
   UPDATE_FREQUENCY, UPDATE_FREQUENCY_PROPS, UPDATE_PRECISION, UPDATE_PRECISION_PROPS, WS_STATE, WS_STATE_PROPS,
 } from 'src/redux/model';
@@ -27,6 +27,7 @@ function mapStateToProps(state) {
     wsState: getWsState(state),
     frequency: getUpdateFrequency(state),
     precision: getUpdatePrecision(state),
+    isResubscribingToOrders: isResubscribingToOrders(state),
   };
 }
 
@@ -36,6 +37,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
     wsState: WS_STATE_PROPS,
     frequency: UPDATE_FREQUENCY_PROPS,
     precision: UPDATE_PRECISION_PROPS,
+    isResubscribingToOrders: PropTypes.bool,
   };
 
 
@@ -74,6 +76,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
 
   render() {
     const { wsState, frequency, precision } = this.props;
+    const resubscribing = this.props.isResubscribingToOrders;
     const connectionButtonDisabled = (wsState === WS_STATE.CONNECTING || wsState === WS_STATE.CLOSING);
     let connectionButtonLabel = 'Wait...';
     if (wsState === WS_STATE.NOT_CONNECTED) {
@@ -89,9 +92,9 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
       <div>
         <WebsocketClient />
         {renderButton(this.toggleConnectionButton, connectionButtonLabel, connectionButtonDisabled)}
-        {renderButton(this.toggleOrdersFrequency, throttleButtonLabel, false)}
-        {renderButton(this.increasePrecision, increasePrecLabel, precision === UPDATE_PRECISION.P0)}
-        {renderButton(this.decreasePrecision, decreasePrecLabel, precision === UPDATE_PRECISION.P3)}
+        {renderButton(this.toggleOrdersFrequency, throttleButtonLabel, resubscribing)}
+        {renderButton(this.increasePrecision, increasePrecLabel, precision === UPDATE_PRECISION.P0 || resubscribing)}
+        {renderButton(this.decreasePrecision, decreasePrecLabel, precision === UPDATE_PRECISION.P3 || resubscribing)}
         <Ticker />
         <Orders />
         <Trades />

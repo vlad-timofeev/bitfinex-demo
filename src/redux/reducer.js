@@ -1,5 +1,6 @@
 import {
   CURRENT_UPDATE_FREQUENCY, CURRENT_UPDATE_PRECISION, CURRENT_WS_STATE, ORDER_ASKS, ORDER_BIDS, TICKER, TRADES,
+  RESUBSCRIBING_TO_ORDERS,
 } from './constants';
 import * as types from './actionTypes';
 import { ORDER, UPDATE_FREQUENCY, UPDATE_PRECISION, WS_STATE } from './model';
@@ -12,6 +13,7 @@ const initialState = {
   [CURRENT_WS_STATE]: WS_STATE.NOT_CONNECTED,
   [CURRENT_UPDATE_FREQUENCY]: UPDATE_FREQUENCY.REAL_TIME,
   [CURRENT_UPDATE_PRECISION]: UPDATE_PRECISION.P0,
+  [RESUBSCRIBING_TO_ORDERS]: false,
 };
 
 function sortOrdersByPrice(orders, sign) {
@@ -93,6 +95,11 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         [CURRENT_UPDATE_PRECISION]: action.precision,
+      };
+    case types.SET_RESUBSCRIBING_TO_ORDERS:
+      return {
+        ...state,
+        [RESUBSCRIBING_TO_ORDERS]: action.resubscribingToOrders,
       };
     default:
       return state;

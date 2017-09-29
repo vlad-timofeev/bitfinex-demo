@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import connectWs from 'src/api/bitfinexApi';
-import { addTrade, setOrders, setTrades, setWsState, updateOrder, updateTicker } from 'src/redux/actions';
+import {
+  addTrade, setOrders, setResubscribingToOrders, setTrades, setWsState, updateOrder, updateTicker,
+} from 'src/redux/actions';
 import { getUpdateFrequency, getUpdatePrecision, getWsState } from 'src/redux/selectors';
 import {
   ORDER, TICKER, TRADE, UPDATE_FREQUENCY_PROPS, UPDATE_PRECISION_PROPS, WS_STATE, WS_STATE_PROPS,
@@ -90,6 +92,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
   resubscribeToOrders() {
     const { bookChannelId } = this.state;
     if (bookChannelId) {
+      this.props.dispatch(setResubscribingToOrders(true));
       this.state.ws.send(JSON.stringify({
         event: 'unsubscribe',
         chanId: bookChannelId,
@@ -150,6 +153,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
       this.setState({ tickerChannelId: chanId });
     } else if (channel === 'book') {
       this.setState({ bookChannelId: chanId });
+      this.props.dispatch(setResubscribingToOrders(false));
     }
   }
 
