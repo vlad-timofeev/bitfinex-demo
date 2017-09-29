@@ -34,3 +34,24 @@ export function updateOrder(order) {
     order,
   };
 }
+
+export function setWsState(wsState) {
+  return {
+    type: types.SET_WS_STATE,
+    wsState,
+  };
+}
+
+export function setUpdateFrequency(frequency) {
+  return {
+    type: types.SET_UPDATE_FREQUENCY,
+    frequency,
+  };
+}
+
+export function setUpdatePrecision(precision) {
+  return {
+    type: types.SET_UPDATE_PRECISION,
+    precision,
+  };
+}

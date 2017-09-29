@@ -1,12 +1,17 @@
-import { ORDER_ASKS, ORDER_BIDS, TICKER, TRADES } from './constants';
+import {
+  CURRENT_UPDATE_FREQUENCY, CURRENT_UPDATE_PRECISION, CURRENT_WS_STATE, ORDER_ASKS, ORDER_BIDS, TICKER, TRADES,
+} from './constants';
 import * as types from './actionTypes';
-import { ORDER } from './model';
+import { ORDER, UPDATE_FREQUENCY, UPDATE_PRECISION, WS_STATE } from './model';
 
 const initialState = {
   [TRADES]: [],
   [TICKER]: null,
   [ORDER_BIDS]: [],
   [ORDER_ASKS]: [],
+  [CURRENT_WS_STATE]: WS_STATE.NOT_CONNECTED,
+  [CURRENT_UPDATE_FREQUENCY]: UPDATE_FREQUENCY.REAL_TIME,
+  [CURRENT_UPDATE_PRECISION]: UPDATE_PRECISION.P0,
 };
 
 function sortOrdersByPrice(orders, sign) {
@@ -73,6 +78,21 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         ...updateOrders(state[ORDER_ASKS], state[ORDER_BIDS], action.order),
+      };
+    case types.SET_WS_STATE:
+      return {
+        ...state,
+        [CURRENT_WS_STATE]: action.wsState,
+      };
+    case types.SET_UPDATE_FREQUENCY:
+      return {
+        ...state,
+        [CURRENT_UPDATE_FREQUENCY]: action.frequency,
+      };
+    case types.SET_UPDATE_PRECISION:
+      return {
+        ...state,
+        [CURRENT_UPDATE_PRECISION]: action.precision,
       };
     default:
       return state;

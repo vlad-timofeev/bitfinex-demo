@@ -3,3 +3,7 @@ export const ADD_TRADE = 'ADD_TRADE';
 export const UPDATE_TICKER = 'UPDATE_TICKER';
 export const SET_ORDERS = 'SET_ORDERS';
 export const UPDATE_ORDER = 'UPDATE_ORDER';
+export const SET_WS_STATE = 'SET_WS_STATE';
+export const SET_UPDATE_FREQUENCY = 'SET_UPDATE_FREQUENCY';
+export const SET_UPDATE_PRECISION = 'SET_UPDATE_PRECISION';
+
