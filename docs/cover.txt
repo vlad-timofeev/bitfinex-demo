@@ -1,0 +1,12 @@
+Some things the could be improved (if I had more time):
+*) Split "dependencies and devDependencies" in package.json
+*) Introduce better error handling when interacting with Websocket
+*) Make better decomposition of React components
+*) Create graphs
+
+Other notes:
+*) Most recent versions of the libraries were used including new React 16 and NPM 5
+*) I believe resources minification is done with respect to the best practices. JS file is 178kb, gzipped version will
+be ~50kb.
+*) The need for "src/" prefix in imports can be easily eliminated by altering webpack configuration
+*) I didn't focused too much on styles as we agreed
