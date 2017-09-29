@@ -6,6 +6,8 @@ import { getTrades } from 'src/redux/selectors';
 import { TRADE, TRADE_PROPS } from 'src/redux/model';
 
 
+const MAX_TRADES = 25;
+
 function mapStateToProps(state) {
   return {
     trades: getTrades(state),
@@ -18,11 +20,28 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
   };
 
   render() {
-    const trades = this.props.trades.map(trade => <div key={trade[TRADE.ID]}>{JSON.stringify(trade)}</div>);
+    const { trades } = this.props;
+    const lastTrades = trades.slice(trades.length - MAX_TRADES).reverse();
+    const renderedTrades = lastTrades.map(trade => (
+      <tr key={trade[TRADE.ID]} className={trade[TRADE.AMOUNT] > 0 ? 'green-row' : 'red-row'}>
+        <th>{new Date(trade[TRADE.TIMESTAMP]).toISOString().substr(11, 8)}</th>
+        <th>{Math.abs(trade[TRADE.AMOUNT])}</th>
+        <th>{trade[TRADE.PRICE]}</th>
+      </tr>
+    ));
     return (
       <div>
-        Trades:
-        {trades}
+        <div><b>Trades:</b></div>
+        <table>
+          <tbody>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Price</th>
+            </tr>
+            {renderedTrades}
+          </tbody>
+        </table>
       </div>
     );
   }

@@ -1,0 +1,27 @@
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  font-weight: normal;
+  padding: 5px;
+  text-align: left;
+}
+
+table {
+  width: 30%;
+}
+
+th, td {
+}
+
+th {
+}
+
+tr {
+  &.red-row {
+    background-color: #FFEEEE;
+  }
+
+  &.green-row {
+    background-color: #EEFFEE;
+  }
+}
