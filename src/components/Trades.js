@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 
 import { getTrades } from 'src/redux/selectors';
 import { TRADE, TRADE_PROPS } from 'src/redux/model';
+import { renderTable } from 'src/utils/renderingUtils';
 
 
 const MAX_TRADES = 25;
@@ -29,21 +30,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
         <th>{trade[TRADE.PRICE]}</th>
       </tr>
     ));
-    return (
-      <div>
-        <div><b>Trades:</b></div>
-        <table>
-          <tbody>
-            <tr>
-              <th>Date</th>
-              <th>Amount</th>
-              <th>Price</th>
-            </tr>
-            {renderedTrades}
-          </tbody>
-        </table>
-      </div>
-    );
+    return renderTable('Trades:', 'Date', 'Amount', 'Price', renderedTrades);
   }
 });
 

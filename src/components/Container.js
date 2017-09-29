@@ -96,8 +96,10 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
         {renderButton(this.increasePrecision, increasePrecLabel, precision === UPDATE_PRECISION.P0 || resubscribing)}
         {renderButton(this.decreasePrecision, decreasePrecLabel, precision === UPDATE_PRECISION.P3 || resubscribing)}
         <Ticker />
-        <Orders />
-        <Trades />
+        <div className="tables-container">
+          <Orders />
+          <Trades />
+        </div>
       </div>
     );
   }

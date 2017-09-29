@@ -7,7 +7,9 @@ table, th, td {
 }
 
 table {
-  width: 30%;
+  width: 30vw;
+  margin: 5px;
+  font-size: 14px;
 }
 
 tr {
@@ -17,5 +19,9 @@ tr {
 
   &.green-row {
     background-color: #EEFFEE;
+  }
+
+  &.blue-row {
+    background-color: #EEEEFF;
   }
 }
