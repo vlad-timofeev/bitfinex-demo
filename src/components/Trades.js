@@ -26,7 +26,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
     const renderedTrades = lastTrades.map(trade => (
       <tr key={trade[TRADE.ID]} className={trade[TRADE.AMOUNT] > 0 ? 'green-row' : 'red-row'}>
         <th>{new Date(trade[TRADE.TIMESTAMP]).toISOString().substr(11, 8)}</th>
-        <th>{Math.abs(trade[TRADE.AMOUNT])}</th>
+        <th>{Math.abs(trade[TRADE.AMOUNT].toFixed(2))}</th>
         <th>{trade[TRADE.PRICE]}</th>
       </tr>
     ));

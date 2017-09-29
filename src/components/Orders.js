@@ -26,7 +26,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
       <tr key={order[ORDER.PRICE]} className="blue-row">
         <th>{order[ORDER.PRICE]}</th>
         <th>{order[ORDER.COUNT]}</th>
-        <th>{order[ORDER.AMOUNT]}</th>
+        <th>{Math.abs(order[ORDER.AMOUNT].toFixed(2))}</th>
       </tr>
     ));
     return (
