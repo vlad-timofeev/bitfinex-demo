@@ -88,6 +88,8 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
     const throttleButtonLabel = (frequency === UPDATE_FREQUENCY.REAL_TIME) ? 'Throttle' : 'Real-time';
     const increasePrecLabel = 'Increase Precision';
     const decreasePrecLabel = 'Decrease Precision';
+    const frequencyString = (frequency === UPDATE_FREQUENCY.REAL_TIME) ? 'real-time' : 'throttled';
+    const description = `Precision: ${precision}, frequency: ${frequencyString}`;
     return (
       <div>
         <WebsocketClient />
@@ -96,6 +98,7 @@ export default connect(mapStateToProps)(class extends React.PureComponent {
         {renderButton(this.increasePrecision, increasePrecLabel, precision === UPDATE_PRECISION.P0 || resubscribing)}
         {renderButton(this.decreasePrecision, decreasePrecLabel, precision === UPDATE_PRECISION.P3 || resubscribing)}
         <Ticker />
+        <div className="orders-description">{description}</div>
         <div className="tables-container">
           <Orders />
           <Trades />
