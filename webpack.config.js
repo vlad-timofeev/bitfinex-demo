@@ -26,10 +26,7 @@ const configuration = {
   },
 
   plugins: [
-    new ExtractTextPlugin({
-      filename: '[name].css',
-      allChunks: true,
-    }),
+    new ExtractTextPlugin('style.css'),
     new HtmlWebpackPlugin({
       inject: 'body',
       filename: 'index.html',
@@ -62,9 +59,20 @@ const configuration = {
         },
       },
       {
+        test: /\.css$/,
+        exclude: /node_modules/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader',
+        }),
+      },
+      {
         test: /\.scss$/,
-        exclude: ['node_modules'],
-        loaders: ['style-loader', 'css-loader?importLoaders=1', 'sass-loader'],
+        exclude: /node_modules/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader!sass-loader',
+        }),
       },
     ],
   },
